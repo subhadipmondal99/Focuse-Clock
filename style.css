@@ -1,0 +1,583 @@
+:root {
+    --bg-color: #0d0d0f;
+    --surface: #1a1a1f;
+    --surface-light: #25252c;
+    --text-primary: #f0f0f0;
+    --text-muted: #8a8a93;
+    --accent-start: #f5a623;
+    --accent-end: #e8521a;
+    --danger: #ff3b3b;
+    --divider: rgba(255, 255, 255, 0.1);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background-color: var(--bg-color);
+    color: var(--text-primary);
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    position: relative;
+}
+
+/* FULLSCREEN OVERRIDES */
+body.is-fullscreen header .logo,
+body.is-fullscreen header .tabs {
+    display: none;
+    /* Hide UI in fullscreen so the clock is massive */
+}
+
+body.is-fullscreen header {
+    position: absolute;
+    width: 100%;
+    border: none;
+    z-index: 100;
+}
+
+body.is-fullscreen header .header-controls {
+    width: 100%;
+    justify-content: flex-end;
+    /* Keep shrink icon on the right */
+}
+
+/* Noise Texture */
+body::before {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: url('data:image/svg+xml;utf8,<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"><filter id="noiseFilter"><feTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves="3" stitchTiles="stitch"/></filter><rect width="100%" height="100%" filter="url(%23noiseFilter)"/></svg>');
+    opacity: 0.04;
+    pointer-events: none;
+    z-index: 999;
+}
+
+/* Red Vignette Warning */
+#warning-vignette {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    box-shadow: inset 0 0 150px var(--danger);
+    opacity: 0;
+    pointer-events: none;
+    z-index: 900;
+    transition: opacity 0.2s;
+}
+
+@keyframes flicker {
+    0% {
+        opacity: 0;
+    }
+
+    50% {
+        opacity: 0.6;
+    }
+
+    100% {
+        opacity: 0;
+    }
+}
+
+.vignette-active {
+    animation: flicker 0.5s infinite;
+}
+
+header {
+    padding: 1.5rem 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--divider);
+    z-index: 10;
+    position: relative;
+}
+
+.logo {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.8rem;
+    background: linear-gradient(135deg, var(--accent-start), var(--accent-end));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    letter-spacing: 2px;
+}
+
+.header-controls {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+}
+
+button {
+    background: none;
+    border: none;
+    color: var(--text-primary);
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    transition: 0.2s;
+}
+
+.icon-btn {
+    background: var(--surface);
+    padding: 0.5rem;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.icon-btn:hover {
+    background: var(--surface-light);
+}
+
+.icon-btn svg {
+    width: 20px;
+    height: 20px;
+    fill: currentColor;
+}
+
+.tabs {
+    display: flex;
+    background: var(--surface);
+    border-radius: 12px;
+    padding: 4px;
+}
+
+.tab {
+    padding: 0.5rem 1.5rem;
+    border-radius: 8px;
+    font-weight: 500;
+    color: var(--text-muted);
+}
+
+.tab.active {
+    background: var(--surface-light);
+    color: var(--text-primary);
+}
+
+main {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 10;
+    position: relative;
+}
+
+.pane {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    max-width: 600px;
+    padding: 2rem;
+}
+
+.pane.active {
+    display: flex;
+}
+
+/* --- Clock Tab (MASSIVE FLIP CLOCK LOGIC) --- */
+#clock.pane {
+    max-width: 100vw;
+    /* Remove the 600px limit specifically for the clock */
+    padding: 1rem;
+}
+
+.clock-container {
+    display: flex;
+    gap: min(2vw, 1.5rem);
+    align-items: center;
+}
+
+.colon {
+    font-size: min(12vw, 15vh);
+    /* Dynamic colon size */
+    font-family: 'Bebas Neue', sans-serif;
+    color: var(--text-muted);
+    transform: translateY(-10%);
+}
+
+.flip-unit {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.flip-card {
+    position: relative;
+    /* DYNAMIC SIZING: Chooses whichever is smaller so it never creates a scrollbar */
+    width: min(26vw, 30vh);
+    height: min(38vw, 44vh);
+    background: var(--surface);
+    border-radius: 12px;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: min(22vw, 25vh);
+    color: var(--text-primary);
+    text-align: center;
+    line-height: min(38vw, 44vh);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
+    perspective: 1000px;
+}
+
+.flip-card::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background: var(--bg-color);
+    z-index: 5;
+    transform: translateY(-50%);
+}
+
+.card-top,
+.card-bottom,
+.flap-top,
+.flap-bottom {
+    position: absolute;
+    left: 0;
+    width: 100%;
+    height: 50%;
+    overflow: hidden;
+    background: var(--surface);
+    border-radius: 12px;
+}
+
+.card-top,
+.flap-top {
+    top: 0;
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+    line-height: min(38vw, 44vh);
+}
+
+.card-bottom,
+.flap-bottom {
+    bottom: 0;
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+    line-height: 0;
+}
+
+.flap-top {
+    transform-origin: bottom;
+    z-index: 4;
+}
+
+.flap-bottom {
+    transform-origin: top;
+    z-index: 3;
+    transform: rotateX(90deg);
+}
+
+@keyframes foldDown {
+    0% {
+        transform: rotateX(0deg);
+    }
+
+    100% {
+        transform: rotateX(-90deg);
+    }
+}
+
+@keyframes unfoldDown {
+    0% {
+        transform: rotateX(90deg);
+    }
+
+    100% {
+        transform: rotateX(0deg);
+    }
+}
+
+.flip-card.animating .flap-top {
+    animation: foldDown 0.3s ease-in forwards;
+}
+
+.flip-card.animating .flap-bottom {
+    animation: unfoldDown 0.3s ease-out 0.3s forwards;
+}
+
+.clock-meta {
+    margin-top: min(4vw, 3rem);
+    text-align: center;
+}
+
+.clock-date {
+    font-size: clamp(1rem, 2vw, 1.5rem);
+    color: var(--text-muted);
+    margin-bottom: 0.5rem;
+}
+
+.clock-ampm {
+    display: inline-block;
+    padding: 0.4rem 1rem;
+    background: linear-gradient(135deg, var(--accent-start), var(--accent-end));
+    border-radius: 6px;
+    font-weight: 700;
+    font-size: clamp(0.9rem, 1.5vw, 1.2rem);
+}
+
+/* --- Timer Tab --- */
+.timer-setup {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    width: 100%;
+    align-items: center;
+}
+
+.input-group {
+    display: flex;
+    gap: 1rem;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 4rem;
+}
+
+.input-group input {
+    width: 80px;
+    background: transparent;
+    border: none;
+    color: var(--text-primary);
+    font-family: inherit;
+    font-size: inherit;
+    text-align: center;
+    border-bottom: 2px solid var(--surface-light);
+    outline: none;
+    transition: 0.3s;
+}
+
+.input-group input:focus {
+    border-color: var(--accent-start);
+}
+
+.timer-settings {
+    width: 100%;
+    max-width: 300px;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.timer-settings label {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+}
+
+.timer-settings select {
+    width: 100%;
+    padding: 0.75rem;
+    background: var(--surface);
+    color: var(--text-primary);
+    border: 1px solid var(--surface-light);
+    border-radius: 8px;
+    outline: none;
+}
+
+.timer-running {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+}
+
+.progress-ring {
+    transform: rotate(-90deg);
+}
+
+.progress-ring__circle {
+    transition: stroke-dashoffset 0.1s linear;
+    stroke: url(#gradient);
+}
+
+.timer-display {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 4.5rem;
+    color: var(--text-primary);
+}
+
+.controls {
+    display: flex;
+    gap: 1rem;
+    margin-top: 2rem;
+    align-items: center;
+}
+
+.btn-primary,
+.btn-secondary {
+    padding: 0.75rem 2rem;
+    border-radius: 25px;
+    font-size: 1rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, var(--accent-start), var(--accent-end));
+    color: #fff;
+}
+
+.btn-primary:hover {
+    opacity: 0.9;
+}
+
+.btn-secondary {
+    background: var(--surface);
+    border: 1px solid var(--surface-light);
+}
+
+.btn-secondary:hover {
+    background: var(--surface-light);
+}
+
+.status-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--text-muted);
+    transition: 0.3s;
+}
+
+.status-dot.active {
+    background: var(--accent-start);
+    box-shadow: 0 0 8px var(--accent-start);
+}
+
+/* --- Stopwatch Tab --- */
+.stopwatch-display {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 6rem;
+    letter-spacing: 2px;
+}
+
+.stopwatch-cents {
+    font-size: 3rem;
+    color: var(--text-muted);
+}
+
+.lap-list {
+    margin-top: 2rem;
+    width: 100%;
+    max-width: 400px;
+    max-height: 200px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    padding-right: 0.5rem;
+}
+
+.lap-list::-webkit-scrollbar {
+    width: 6px;
+}
+
+.lap-list::-webkit-scrollbar-thumb {
+    background: var(--surface-light);
+    border-radius: 3px;
+}
+
+.lap-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.75rem 1rem;
+    background: var(--surface);
+    border-radius: 8px;
+    font-variant-numeric: tabular-nums;
+}
+
+.lap-item span {
+    color: var(--text-muted);
+}
+
+.lap-item .lap-total {
+    color: var(--text-primary);
+    font-weight: 700;
+}
+
+/* Alarm Overlay */
+.alarm-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(13, 13, 15, 0.95);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    opacity: 0;
+    pointer-events: none;
+    transition: 0.3s;
+    backdrop-filter: blur(5px);
+}
+
+.alarm-overlay.active {
+    opacity: 1;
+    pointer-events: all;
+}
+
+.alarm-bell {
+    font-size: 5rem;
+    animation: shake 0.5s infinite;
+    margin-bottom: 2rem;
+}
+
+@keyframes shake {
+
+    0%,
+    100% {
+        transform: rotate(0);
+    }
+
+    25% {
+        transform: rotate(-15deg);
+    }
+
+    75% {
+        transform: rotate(15deg);
+    }
+}
+
+@media (max-width: 600px) {
+    .tabs {
+        margin-top: 1rem;
+    }
+
+    header {
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .header-controls {
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    .stopwatch-display {
+        font-size: 4.5rem;
+    }
+
+    .stopwatch-cents {
+        font-size: 2.5rem;
+    }
+}
