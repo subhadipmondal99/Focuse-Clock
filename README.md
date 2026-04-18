@@ -1,18 +1,18 @@
 # ⏳ FocusClock — Smart Time Management Web App
 
-FocusClock is a modern, feature-rich web application designed to help users manage time efficiently with an elegant and distraction-free interface. It combines a real-time flip clock, countdown timer, and stopwatch into a single seamless experience.
+FocusClock is a modern and interactive web application designed to help users manage time efficiently with a clean, distraction-free interface. It integrates a real-time flip clock, countdown timer, and stopwatch into one seamless experience.
 
 ---
 
 ## 🚀 Live Demo
 
-🔗 https://your-vercel-link.vercel.app
+🔗 https://focuse-clock.vercel.app/
 
 ---
 
 ## 📌 Overview
 
-This project is built using pure frontend technologies and focuses on performance, smooth animations, and clean UI design. It provides essential time-tracking tools with an intuitive user experience.
+This project is built using pure frontend technologies and focuses on smooth animations, performance, and modern UI design. It provides essential time management tools with an intuitive and engaging user experience.
 
 ---
 
@@ -39,7 +39,6 @@ This project is built using pure frontend technologies and focuses on performanc
 * 🔔 **Audio System**
 
   * Built-in alarm tones (Bell, Digital, Chime, Beep, Soft, Ringtone)
-  * Implemented using Web Audio API
 
 * 🖥️ **Fullscreen Mode**
 
@@ -82,13 +81,13 @@ FocusClock/
 1. Clone the repository:
 
 ```
-git clone https://github.com/your-username/focusclock.git
+git clone https://github.com/subhadipmondal99/Focuse-Clock.git
 ```
 
 2. Navigate to the project folder:
 
 ```
-cd focusclock
+cd Focuse-Clock
 ```
 
 3. Open `index.html` in your browser
@@ -99,20 +98,24 @@ cd focusclock
 
 This project is deployed using **Vercel** for fast and reliable hosting.
 
-Steps:
+---
 
-* Push code to GitHub
-* Import repository into Vercel
-* Deploy instantly
+## 🔗 Links
+
+* 🔹 GitHub Repository:
+  https://github.com/subhadipmondal99/Focuse-Clock.git
+
+* 🔹 LinkedIn Profile:
+  https://www.linkedin.com/in/subhadip--mondal
 
 ---
 
 ## 🎯 Future Enhancements
 
 * Custom alarm upload
-* Local storage for saving preferences
+* Save user preferences (Local Storage)
 * Mobile UI improvements
-* PWA (Progressive Web App) support
+* Progressive Web App (PWA) support
 
 ---
 
@@ -124,18 +127,12 @@ Steps:
 
 ---
 
-## 📢 Acknowledgement
-
-This project is built as part of learning and practice in frontend development and UI design.
-
----
-
 ## ⭐ Support
 
 If you like this project:
 
 * Give it a ⭐ on GitHub
-* Share it with others
-* Connect on LinkedIn
+* Share it on LinkedIn
+* Connect with me
 
 ---
